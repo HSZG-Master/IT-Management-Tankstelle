@@ -10,7 +10,7 @@ public class Simulation {
     private static final int PERCENTAGE_OF_DRIVERS_GAS_AND_WASHING = 20;
     private static final int PERCENTAGE_OF_DRIVERS_WASHING_ONLY = 5;
     private static final int MEAN_FUELING_TIME_IN_SECONDS = 180;
-    private static final int STANDARD_DEVIATION_FUELING_TIME_IN_SECONDS = 36;
+    private static final double STANDARD_DEVIATION_FUELING_TIME_IN_SECONDS = 0.6;
     private static final int WASHING_TIME_IN_SECONDS = 240;
     private static final int MINIMUM_TIME_FOR_PAYMENT_IN_SECONDS = 60;
     private static final int MAXIMUM_TIME_FOR_PAYMENT_IN_SECONDS = 180;
@@ -100,25 +100,22 @@ public class Simulation {
 
         if (customerTypeValue <= PERCENTAGE_OF_DRIVERS_WASHING_ONLY) {
             // Waschen
-            // Car washs have to be paid in advance and take time exactly 4 minutes
-
-            // Payment 1 - 3 Minuten
-            // random.nextInt(max - min + 1) + min
             addEventToQueue(Distributions.newUniformDistributedValue(60, 180), EventType.END_OF_PAYMENT_WASHING_ONLY);
+
         } else if (fuelStationsInUse < COUNT_FUELSTATIONS) {
             fuelStationsInUse++;
 
             if (customerTypeValue <= (PERCENTAGE_OF_DRIVERS_GAS_AND_WASHING + PERCENTAGE_OF_DRIVERS_WASHING_ONLY)) {
                 // Tanken und Waschen
-                addEventToQueue(Distributions.newNormalDistributedValue(180, 0.6), EventType.END_OF_REFUELING_WASHING_AND_REFUELING);
+                addEventToQueue(Distributions.newNormalDistributedValue(MEAN_FUELING_TIME_IN_SECONDS, STANDARD_DEVIATION_FUELING_TIME_IN_SECONDS), EventType.END_OF_REFUELING_WASHING_AND_REFUELING);
             } else {
                 // Tanken
-                addEventToQueue(Distributions.newNormalDistributedValue(180, 0.6), EventType.END_OF_REFUELING_FUEL_ONLY);
+                addEventToQueue(Distributions.newNormalDistributedValue(MEAN_FUELING_TIME_IN_SECONDS, STANDARD_DEVIATION_FUELING_TIME_IN_SECONDS), EventType.END_OF_REFUELING_FUEL_ONLY);
             }
         } else {
             int customerLeavingValue = Distributions.newUniformDistributedValue(0, 100);
 
-            if (customerLeavingValue > 33) {
+            if (customerLeavingValue > LEAVING_CUSTOMER_PERCENTAGE) {
 
                 if (customerTypeValue <= (PERCENTAGE_OF_DRIVERS_GAS_AND_WASHING + PERCENTAGE_OF_DRIVERS_WASHING_ONLY)) {
 
@@ -137,7 +134,7 @@ public class Simulation {
 
     private void endOfRefuelingWashingAndRefueling() {
 
-        addEventToQueue(Distributions.newUniformDistributedValue(60, 180), EventType.END_OF_PAYMENT_WASHING_AND_REFUELING);
+        addEventToQueue(Distributions.newUniformDistributedValue(MINIMUM_TIME_FOR_PAYMENT_IN_SECONDS, MAXIMUM_TIME_FOR_PAYMENT_IN_SECONDS), EventType.END_OF_PAYMENT_WASHING_AND_REFUELING);
     }
 
     private void endOfRefuelingOnly() {
@@ -146,7 +143,7 @@ public class Simulation {
 
         if (payingTypeValue <= 50) {
 
-            addEventToQueue(Distributions.newUniformDistributedValue(60, 180), EventType.END_OF_PAYMENT_FUEL_ONLY);
+            addEventToQueue(Distributions.newUniformDistributedValue(MINIMUM_TIME_FOR_PAYMENT_IN_SECONDS, MAXIMUM_TIME_FOR_PAYMENT_IN_SECONDS), EventType.END_OF_PAYMENT_FUEL_ONLY);
         } else {
 
             endOfPaymentFuelOnly();
@@ -178,7 +175,7 @@ public class Simulation {
         if (!pumpWaitingQueue.isEmpty()) {
 
             EventType event = pumpWaitingQueue.pop();
-            addEventToQueue(Distributions.newNormalDistributedValue(180, 0.6), event);
+            addEventToQueue(Distributions.newNormalDistributedValue(MEAN_FUELING_TIME_IN_SECONDS, STANDARD_DEVIATION_FUELING_TIME_IN_SECONDS), event);
 
         } else {
 
