@@ -91,10 +91,10 @@ public class Simulation {
     private void arrivalAtGasstation() {
         // 75% tanken, 5%waschen, 20% tanken UND Waschen
 
-        Random random = new Random();
+        int customerTypeValue = Distributions.newUniformDistributedValue(0,100);
 
-        int customerTypeValue = random.nextInt(100) + 1;
         totalCustomerCount++;
+
         //nächster Kunde der an die Tankstelle fährt
         addEventToQueue(Distributions.newPoissonDistributedRandomValue(CUSTOMER_ARRIVAL_INTERVAL_IN_SECONDS),EventType.ARRIVAL_AT_GASSTATION);
 
@@ -104,7 +104,7 @@ public class Simulation {
 
             // Payment 1 - 3 Minuten
             // random.nextInt(max - min + 1) + min
-            addEventToQueue((random.nextInt(180 - 60 + 1) + 60), EventType.END_OF_PAYMENT_WASHING_ONLY);
+            addEventToQueue(Distributions.newUniformDistributedValue(60,180), EventType.END_OF_PAYMENT_WASHING_ONLY);
         } else if (fuelStationsInUse < 4)
 
         {
