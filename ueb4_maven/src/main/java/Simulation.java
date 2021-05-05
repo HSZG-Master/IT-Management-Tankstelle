@@ -1,6 +1,5 @@
 import java.util.LinkedList;
 import java.util.PriorityQueue;
-import java.util.Random;
 
 public class Simulation {
 
@@ -28,7 +27,6 @@ public class Simulation {
     private LinkedList<EventType> pumpWaitingQueue;
 
     public static void main(String[] args) {
-
         new Simulation().start();
     }
 
@@ -70,6 +68,7 @@ public class Simulation {
                     System.out.println("Unsupported event");
             }
         }
+
         System.out.println("Anzahl totaler Kunden: " + totalCustomerCount);
         System.out.println("Anzahl verlorener Kunden: " + lostCustomerCount);
 
@@ -91,12 +90,12 @@ public class Simulation {
     private void arrivalAtGasstation() {
         // 75% tanken, 5%waschen, 20% tanken UND Waschen
 
-        int customerTypeValue = Distributions.newUniformDistributedValue(0,100);
+        int customerTypeValue = Distributions.newUniformDistributedValue(0, 100);
 
         totalCustomerCount++;
 
         //nächster Kunde der an die Tankstelle fährt
-        addEventToQueue(Distributions.newPoissonDistributedRandomValue(CUSTOMER_ARRIVAL_INTERVAL_IN_SECONDS),EventType.ARRIVAL_AT_GASSTATION);
+        addEventToQueue(Distributions.newPoissonDistributedRandomValue(CUSTOMER_ARRIVAL_INTERVAL_IN_SECONDS), EventType.ARRIVAL_AT_GASSTATION);
 
         if (customerTypeValue <= PERCENTAGE_OF_DRIVERS_WASHING_ONLY) {
             // Waschen
@@ -104,19 +103,15 @@ public class Simulation {
 
             // Payment 1 - 3 Minuten
             // random.nextInt(max - min + 1) + min
-            addEventToQueue(Distributions.newUniformDistributedValue(60,180), EventType.END_OF_PAYMENT_WASHING_ONLY);
-        } else if (fuelStationsInUse < 4)
-
-        {
+            addEventToQueue(Distributions.newUniformDistributedValue(60, 180), EventType.END_OF_PAYMENT_WASHING_ONLY);
+        } else if (fuelStationsInUse < 4) {
             if (customerTypeValue <= (PERCENTAGE_OF_DRIVERS_GAS_AND_WASHING + PERCENTAGE_OF_DRIVERS_WASHING_ONLY)) {
                 // Tanken und Waschen
-                addEventToQueue(Distributions.newNormalDistributedValue(180, 0.6),
-                        EventType.END_OF_REFUELING_WASHING_AND_REFUELING);
+                addEventToQueue(Distributions.newNormalDistributedValue(180, 0.6), EventType.END_OF_REFUELING_WASHING_AND_REFUELING);
 
             } else {
                 // Tanken
-                addEventToQueue(Distributions.newNormalDistributedValue(180, 0.6),
-                        EventType.END_OF_REFUELING_FUEL_ONLY);
+                addEventToQueue(Distributions.newNormalDistributedValue(180, 0.6), EventType.END_OF_REFUELING_FUEL_ONLY);
 
             }
 
@@ -133,9 +128,7 @@ public class Simulation {
 
                     pumpWaitingQueue.add(EventType.END_OF_REFUELING_FUEL_ONLY);
                 }
-            }
-
-            else {
+            } else {
                 lostCustomerCount++;
             }
 
@@ -145,8 +138,7 @@ public class Simulation {
 
     private void endOfRefuelingWashingAndRefueling() {
 
-        addEventToQueue(Distributions.newUniformDistributedValue(60, 180),
-                EventType.END_OF_PAYMENT_WASHING_AND_REFUELING);
+        addEventToQueue(Distributions.newUniformDistributedValue(60, 180), EventType.END_OF_PAYMENT_WASHING_AND_REFUELING);
     }
 
     private void endOfRefuelingOnly() {
