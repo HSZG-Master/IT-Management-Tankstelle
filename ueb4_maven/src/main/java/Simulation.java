@@ -14,6 +14,7 @@ public class Simulation {
     private static final int WASHING_TIME_IN_SECONDS = 240;
     private static final int MINIMUM_TIME_FOR_PAYMENT_IN_SECONDS = 60;
     private static final int MAXIMUM_TIME_FOR_PAYMENT_IN_SECONDS = 180;
+    private static final int COUNT_FUELSTATIONS = 4;
 
     private boolean carWashstationInUse = false;
     private int waitingCustomerForCarWash = 0;
@@ -104,19 +105,17 @@ public class Simulation {
             // Payment 1 - 3 Minuten
             // random.nextInt(max - min + 1) + min
             addEventToQueue(Distributions.newUniformDistributedValue(60, 180), EventType.END_OF_PAYMENT_WASHING_ONLY);
-        } else if (fuelStationsInUse < 4) {
+        } else if (fuelStationsInUse < COUNT_FUELSTATIONS) {
+            fuelStationsInUse++;
+
             if (customerTypeValue <= (PERCENTAGE_OF_DRIVERS_GAS_AND_WASHING + PERCENTAGE_OF_DRIVERS_WASHING_ONLY)) {
                 // Tanken und Waschen
                 addEventToQueue(Distributions.newNormalDistributedValue(180, 0.6), EventType.END_OF_REFUELING_WASHING_AND_REFUELING);
-
             } else {
                 // Tanken
                 addEventToQueue(Distributions.newNormalDistributedValue(180, 0.6), EventType.END_OF_REFUELING_FUEL_ONLY);
-
             }
-
         } else {
-
             int customerLeavingValue = Distributions.newUniformDistributedValue(0, 100);
 
             if (customerLeavingValue > 33) {
